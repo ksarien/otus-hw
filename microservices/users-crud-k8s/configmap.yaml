@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DB_CONNECTION: "mysql"
+  DB_HOST: "app-db-mysql"
+  DB_PORT: "3306"
+  DB_DATABASE: "users_crud"

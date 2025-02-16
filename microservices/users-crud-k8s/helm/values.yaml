@@ -1,0 +1,9 @@
+auth:
+  rootPassword: root
+  database: users_crud
+  username: myuser
+  password: mypass
+
+primary:
+  persistence:
+    enabled: false

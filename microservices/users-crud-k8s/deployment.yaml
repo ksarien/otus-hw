@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-crud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-crud
+  template:
+    metadata:
+      labels:
+        app: users-crud
+    spec:
+      containers:
+        - name: users-crud
+          image: ksarien/otus-users-crud:2.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-credentials
