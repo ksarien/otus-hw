@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: users-crud-servicemonitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: users-crud
+    release: "monitoring"
+spec:
+  jobLabel: users-crud
+  namespaceSelector:
+    matchNames:
+      - "{{ .Release.Namespace }}"
+      - "monitoring"
+  selector:
+    matchLabels:
+      app: users-crud
+  endpoints:
+    - interval: 15s
+      port: web
+      path: /metrics
