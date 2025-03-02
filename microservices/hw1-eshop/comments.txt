@@ -1,0 +1,10 @@
+Пояснения к схеме(diagram.png):
+
+AuthService: после регистрации и аутентификации взаимодействует с UserService (для управления профилем) и отправляет уведомления через NotificationService.
+UserService: предоставляет данные пользователя для оформления заказа и доставки, взаимодействует с OrderService, DeliveryService и NotificationService.
+CatalogService: управляет информацией о товарах, передает данные в CartService и OrderService.
+CartService: собирает товары в корзине и передает их в OrderService для создания заказа.
+OrderService: оформляет заказ, затем инициирует оплату через PaymentService, организует доставку через DeliveryService и уведомляет пользователя через NotificationService.
+PaymentService: обрабатывает платеж и уведомляет NotificationService о результате.
+DeliveryService: организует логистику доставки (расчет сроков, отслеживание) и передает обновления о статусе в NotificationService.
+NotificationService: получает уведомления от всех сервисов и отправляет их пользователю.
