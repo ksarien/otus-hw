@@ -1,0 +1,23 @@
+{{- range .Values.services }}
+{{- if .runMigration }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-{{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate-{{ .name }}
+          image: "{{ .image }}"
+          envFrom:
+            - configMapRef:
+                name: {{ $.Release.Name }}-{{ .name }}-config
+          command: ["php", "artisan", "migrate", "--force"]
+{{- end }}
+{{- end }}

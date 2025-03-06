@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-userservice-config
+  namespace: {{ .Values.global.namespace }}
+data:
+  DB_CONNECTION: "mysql"
+  DB_HOST: "{{ .Values.userservice.env.DB_HOST }}"
+  DB_PORT: "{{ .Values.userservice.env.DB_PORT }}"
+  DB_DATABASE: "{{ .Values.userservice.env.DB_DATABASE }}"
+  DB_USERNAME: "{{ .Values.userservice.env.DB_USERNAME }}"
+  DB_PASSWORD: "{{ .Values.userservice.env.DB_PASSWORD }}"

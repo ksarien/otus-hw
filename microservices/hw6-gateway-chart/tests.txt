@@ -1,0 +1,144 @@
+newman
+
+API Gateway Tests
+
+→ User1 Registration
+  POST http://arch.homework/api/auth/register [201 Created, 301B, 526ms]
+  ✓  Status code is 201
+  ┌
+  │ 'User1 Registration Request:', 'POST', 'http://arch.ho
+  │ mework/api/auth/register'
+  │ 'User1 Registration Response:', '{"user_id":19}'
+  └
+
+→ Profile Access Without Login
+  GET http://arch.homework/api/user/profile/19 [401 Unauthorized, 308B, 105ms]
+  ✓  Status code is 401
+  ┌
+  │ 'Profile Access Without Login Request:', 'GET', 'http:
+  │ //arch.homework/api/user/profile/19'
+  │ 'Profile Access Without Login Response:', '<html>\r\n'
+  │  +
+  │   '<head><title>401 Authorization Required</title></he
+  │ ad>\r\n' +
+  │   '<body>\r\n' +
+  │   '<center><h1>401 Authorization Required</h1></center
+  │ >\r\n' +
+  │   '<hr><center>nginx</center>\r\n' +
+  │   '</body>\r\n' +
+  │   '</html>\r\n'
+  └
+
+→ User1 Login
+  POST http://arch.homework/api/auth/login [200 OK, 371B, 155ms]
+  ✓  Status code is 200
+  ┌
+  │ 'User1 Login Request:', 'POST', 'http://arch.homework/
+  │ api/auth/login'
+  │ 'User1 Login Response:', {
+  │   user_id: 19,
+  │   token: 'GD9KgiUh682WhjF21xl8gM8BK2cFbCRSWU8wMporf5XL
+  │ YF8c0n8m5JEI9svr3Xd4'
+  │ }
+  └
+
+→ User1 Update Profile
+  PUT http://arch.homework/api/user/profile/19 [200 OK, 528B, 210ms]
+  ✓  Status code is 200
+  ┌
+  │ 'User1 Update Profile Request:', 'PUT', 'http://arch.h
+  │ omework/api/user/profile/19'
+  │ 'User1 Update Profile Response:', {
+  │   id: 18,
+  │   user_id: 19,
+  │   first_name: 'UserUpdated',
+  │   last_name: 'OneUpdated',
+  │   username: 'user1_updated',
+  │   phone: '+1234567890',
+  │   email: 'user1_Nicklaus88@gmail.com',
+  │   created_at: '2025-03-06T00:16:04.000000Z',
+  │   updated_at: '2025-03-06T00:16:04.000000Z'
+  │ }
+  └
+  ✓  Response contains first_name, last_name, username, phone
+
+→ User1 Get Profile
+  GET http://arch.homework/api/user/profile/19 [200 OK, 528B, 144ms]
+  ✓  Status code is 200
+  ✓  First name is updated
+  ┌
+  │ 'User1 Get Profile Request:', 'GET', 'http://arch.home
+  │ work/api/user/profile/19'
+  │ 'User1 Get Profile Response:', {
+  │   id: 18,
+  │   user_id: 19,
+  │   first_name: 'UserUpdated',
+  │   last_name: 'OneUpdated',
+  │   username: 'user1_updated',
+  │   phone: '+1234567890',
+  │   email: 'user1_Nicklaus88@gmail.com',
+  │   created_at: '2025-03-06T00:16:04.000000Z',
+  │   updated_at: '2025-03-06T00:16:04.000000Z'
+  │ }
+  └
+
+→ User1 Logout
+  POST http://arch.homework/api/auth/logout [200 OK, 306B, 140ms]
+  ✓  Status code is 200
+  ┌
+  │ 'User1 Logout Request:', 'POST', 'http://arch.homework
+  │ /api/auth/logout'
+  │ 'User1 Logout Response:', { message: 'Logged out' }
+  └
+
+→ User2 Registration
+  POST http://arch.homework/api/auth/register [201 Created, 301B, 239ms]
+  ✓  Status code is 201
+  ┌
+  │ 'User2 Registration Request:', 'POST', 'http://arch.ho
+  │ mework/api/auth/register'
+  │ 'User2 Registration Response:', '{"user_id":20}'
+  └
+
+→ User2 Login
+  POST http://arch.homework/api/auth/login [200 OK, 371B, 147ms]
+  ✓  Status code is 200
+  ┌
+  │ 'User2 Login Request:', 'POST', 'http://arch.homework/
+  │ api/auth/login'
+  │ 'User2 Login Response:', {
+  │   user_id: 20,
+  │   token: 'ey8zDdnhn7aAglLGZ40iAoOzd0IHcfwRwqWqNsGj5Q5Y
+  │ J2zHgkT5qvM6JxdiHeAf'
+  │ }
+  └
+
+→ User2 Get Profile (should be forbidden for User1's profile)
+  GET http://arch.homework/api/user/profile/19 [403 Forbidden, 316B, 121ms]
+  ✓  Status code is 403
+  ┌
+  │ 'User2 Get Profile (forbidden) Request:', 'GET', 'http
+  │ ://arch.homework/api/user/profile/19'
+  │ 'User2 Get Profile (forbidden) Response:', '{"message"
+  │ :"Access Denied"}'
+  └
+
+┌─────────────────────────┬─────────────────────┬────────────────────┐
+│                         │            executed │             failed │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              iterations │                   1 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│                requests │                   9 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│            test-scripts │                   9 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│      prerequest-scripts │                   0 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              assertions │                  11 │                  0 │
+├─────────────────────────┴─────────────────────┴────────────────────┤
+│ total run duration: 1942ms                                         │
+├────────────────────────────────────────────────────────────────────┤
+│ total data received: 921B (approx)                                 │
+├────────────────────────────────────────────────────────────────────┤
+│ average response time: 198ms [min: 105ms, max: 526ms, s.d.: 122ms] │
+└────────────────────────────────────────────────────────────────────┘

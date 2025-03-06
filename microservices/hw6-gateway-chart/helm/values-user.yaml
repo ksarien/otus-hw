@@ -1,0 +1,9 @@
+auth:
+  rootPassword: root_password
+  database: user_db
+  username: user_user
+  password: user_password
+
+primary:
+  persistence:
+    enabled: false

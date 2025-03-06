@@ -1,0 +1,372 @@
+{
+    "info": {
+        "_postman_id": "f9a2d670-1234-4b2a-9c8b-abcdef123456",
+        "name": "API Gateway Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://arch.homework"
+        }
+    ],
+    "item": [
+        {
+            "name": "User1 Registration",
+            "request": {
+                "method": "POST",
+                "header": [
+                    { "key": "Content-Type", "value": "application/json" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"first_name\": \"User\",\n    \"last_name\": \"One\",\n    \"username\": \"user1_{{$randomUUID}}\",\n    \"phone\": \"+{{$randomNumber 10}}\",\n    \"email\": \"user1_{{$randomEmail}}\",\n    \"password\": \"password123\",\n    \"repeat_password\": \"password123\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/register",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "auth", "register"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 201 Created",
+                            "pm.test(\"Status code is 201\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(201);",
+                            "});",
+                            "console.log('User1 Registration Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User1 Registration Response:', pm.response.text());",
+                            "",
+                            "// Сохраняем email и password из тела запроса (так как в ответе их нет)",
+                            "var reqBody = JSON.parse(pm.request.body.raw);",
+                            "pm.environment.set(\"user1_email\", reqBody.email);",
+                            "pm.environment.set(\"user1_password\", reqBody.password);",
+                            "",
+                            "// Сохраняем user1_id: если он возвращается в ответе, используем его; иначе пробуем извлечь из заголовка Location",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "if(res.user_id){",
+                            "    pm.environment.set(\"user1_id\", res.user_id);",
+                            "} else if(pm.response.headers.get('Location')) {",
+                            "    var loc = pm.response.headers.get('Location');",
+                            "    var parts = loc.split('/');",
+                            "    pm.environment.set(\"user1_id\", parts[parts.length - 1]);",
+                            "} else {",
+                            "    // fallback: сохраняем email как идентификатор (не идеально)",
+                            "    pm.environment.set(\"user1_id\", reqBody.email);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Profile Access Without Login",
+            "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                    "raw": "{{baseUrl}}/api/user/profile/{{user1_id}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "user", "profile", "{{user1_id}}"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем 401 Unauthorized без авторизации",
+                            "pm.test(\"Status code is 401\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(401);",
+                            "});",
+                            "console.log('Profile Access Without Login Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('Profile Access Without Login Response:', pm.response.text());"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User1 Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    { "key": "Content-Type", "value": "application/json" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"{{user1_email}}\",\n    \"password\": \"{{user1_password}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/login",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "auth", "login"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 200 OK для логина",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "});",
+                            "console.log('User1 Login Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User1 Login Response:', pm.response.json());",
+                            "",
+                            "// Сохраняем токен и, если есть, user_id из ответа",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "if(res.token){",
+                            "    pm.environment.set(\"user1_token\", res.token);",
+                            "}",
+                            "if(res.user_id){",
+                            "    pm.environment.set(\"user1_id\", res.user_id);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User1 Update Profile",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    { "key": "Content-Type", "value": "application/json" },
+                    { "key": "Accept", "value": "application/json" },
+                    { "key": "Authorization", "value": "{{user1_token}}" }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"first_name\": \"UserUpdated\",\n    \"last_name\": \"OneUpdated\",\n    \"username\": \"user1_updated\",\n    \"phone\": \"+1234567890\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/user/profile/{{user1_id}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "user", "profile", "{{user1_id}}"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 200 OK для обновления профиля",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "});",
+                            "console.log('User1 Update Profile Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User1 Update Profile Response:', pm.response.json());",
+                            "",
+                            "// Проверяем, что в ответе присутствуют все обязательные поля",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "pm.test(\"Response contains first_name, last_name, username, phone\", function () {",
+                            "    pm.expect(res).to.have.property('first_name');",
+                            "    pm.expect(res).to.have.property('last_name');",
+                            "    pm.expect(res).to.have.property('username');",
+                            "    pm.expect(res).to.have.property('phone');",
+                            "});",
+                            "",
+                            "// Сохраняем обновлённое значение first_name для проверки в следующем шаге",
+                            "pm.environment.set(\"user1_updated_first_name\", res.first_name || \"UserUpdated\");"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User1 Get Profile",
+            "request": {
+                "method": "GET",
+                "header": [
+                    { "key": "Accept", "value": "application/json" },
+                    { "key": "Authorization", "value": "{{user1_token}}" }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/user/profile/{{user1_id}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "user", "profile", "{{user1_id}}"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 200 OK для получения профиля",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "});",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "pm.test(\"First name is updated\", function () {",
+                            "    pm.expect(res.first_name).to.eql(pm.environment.get(\"user1_updated_first_name\"));",
+                            "});",
+                            "console.log('User1 Get Profile Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User1 Get Profile Response:', res);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User1 Logout",
+            "request": {
+                "method": "POST",
+                "header": [
+                    { "key": "Authorization", "value": "{{user1_token}}" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/logout",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "auth", "logout"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 200 OK для логаута",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "});",
+                            "console.log('User1 Logout Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User1 Logout Response:', pm.response.json());"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User2 Registration",
+            "request": {
+                "method": "POST",
+                "header": [
+                    { "key": "Content-Type", "value": "application/json" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"first_name\": \"User\",\n    \"last_name\": \"Two\",\n    \"username\": \"user2_{{$randomUUID}}\",\n    \"phone\": \"+{{$randomNumber 10}}\",\n    \"email\": \"user2_{{$randomEmail}}\",\n    \"password\": \"password123\",\n    \"repeat_password\": \"password123\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/register",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "auth", "register"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем статус 201 Created для регистрации User2",
+                            "pm.test(\"Status code is 201\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(201);",
+                            "});",
+                            "console.log('User2 Registration Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User2 Registration Response:', pm.response.text());",
+                            "var reqBody = JSON.parse(pm.request.body.raw);",
+                            "pm.environment.set(\"user2_email\", reqBody.email);",
+                            "pm.environment.set(\"user2_password\", reqBody.password);",
+                            "// Сохраняем user2_id, если он возвращается, иначе используем email",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "if(res.user_id){",
+                            "    pm.environment.set(\"user2_id\", res.user_id);",
+                            "} else {",
+                            "    pm.environment.set(\"user2_id\", reqBody.email);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User2 Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    { "key": "Content-Type", "value": "application/json" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"{{user2_email}}\",\n    \"password\": \"{{user2_password}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/login",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "auth", "login"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Assert: ожидаем статус 200 OK для логина User2",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "});",
+                            "console.log('User2 Login Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User2 Login Response:', pm.response.json());",
+                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
+                            "if(res.token){",
+                            "    pm.environment.set(\"user2_token\", res.token);",
+                            "}",
+                            "if(res.user_id){",
+                            "    pm.environment.set(\"user2_id\", res.user_id);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User2 Get Profile (should be forbidden for User1's profile)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    { "key": "Authorization", "value": "{{user2_token}}" },
+                    { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/user/profile/{{user1_id}}",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "user", "profile", "{{user1_id}}"]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Ожидаем, что доступ к профилю другого пользователя запрещён (403 Forbidden)",
+                            "pm.test(\"Status code is 403\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(403);",
+                            "});",
+                            "console.log('User2 Get Profile (forbidden) Request:', pm.request.method, pm.request.url.toString());",
+                            "console.log('User2 Get Profile (forbidden) Response:', pm.response.text());"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{{- range .Values.mysql.instances }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "{{ .auth.rootPassword }}"
+            - name: MYSQL_DATABASE
+              value: "{{ .auth.database }}"
+            - name: MYSQL_USER
+              value: "{{ .auth.username }}"
+            - name: MYSQL_PASSWORD
+              value: "{{ .auth.password }}"
+          ports:
+            - containerPort: 3306
+{{- end }}
+---
+{{- range .Values.mysql.instances }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: {{ .name }}
+{{- end }}

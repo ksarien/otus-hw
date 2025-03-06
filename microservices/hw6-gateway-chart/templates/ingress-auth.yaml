@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress-auth
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://authservice.otus-gateway.svc.cluster.local:8080/api/auth/validate-token"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-User-Id"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /api/auth/validate-token
+            pathType: Prefix
+            backend:
+              service:
+                name: authservice
+                port:
+                  number: 8080
+          - path: /api/auth/logout
+            pathType: Prefix
+            backend:
+              service:
+                name: authservice
+                port:
+                  number: 8080
+
+          - path: /api/user
+            pathType: Prefix
+            backend:
+              service:
+                name: userservice
+                port:
+                  number: 8081
