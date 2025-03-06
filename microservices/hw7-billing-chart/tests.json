@@ -1,0 +1,79 @@
+{
+    "info": {
+        "_postman_id": "f1010d3f-9fd0-4896-8857-5cd4fc0c4522",
+        "name": "Arch Homework Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {"key": "baseUrl", "value": "http://arch.homework"},
+        {"key": "user1_id", "value": "123"}
+    ],
+    "item": [
+        {
+            "name": "Billing - Create Account",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {"key": "Content-Type", "value": "application/json"},
+                    {"key": "X-User-Id", "value": "{{user1_id}}"}
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"user_id\":123}"
+                },
+                "url": "{{baseUrl}}/api/billing/account"
+            }
+        },
+        {
+            "name": "Billing - Credit Account",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "body": {"mode": "raw", "raw": "{\"amount\":100.50}"},
+                "url": "{{baseUrl}}/api/billing/credit"
+            }
+        },
+        {
+            "name": "Order - Create Order (Enough Funds)",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "body": {"mode": "raw", "raw": "{\"amount\":50.25}"},
+                "url": "{{baseUrl}}/api/orders"
+            }
+        },
+        {
+            "name": "Billing - Check Account After Paid Order",
+            "request": {
+                "method": "GET",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "url": "{{baseUrl}}/api/billing/account"
+            }
+        },
+        {
+            "name": "Order - Create Order (Insufficient Funds)",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "body": {"mode": "raw", "raw": "{\"amount\":999.99}"},
+                "url": "{{baseUrl}}/api/orders"
+            }
+        },
+        {
+            "name": "Billing - Check Account After Failed Order",
+            "request": {
+                "method": "GET",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "url": "{{baseUrl}}/api/billing/account"
+            }
+        },
+        {
+            "name": "Notifications - Get User Notifications",
+            "request": {
+                "method": "GET",
+                "header": [{"key": "X-User-Id", "value": "{{user1_id}}"}],
+                "url": "{{baseUrl}}/api/notifications?user_id={{user1_id}}"
+            }
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{{- range .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+spec:
+  ports:
+    - protocol: TCP
+      port: {{ .port }}
+      targetPort: 80
+  selector:
+    app: {{ .name }}
+{{- end }}

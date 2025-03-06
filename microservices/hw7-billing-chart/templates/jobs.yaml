@@ -1,0 +1,47 @@
+{{- range .Values.services }}
+{{- if .runMigration }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-{{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate-{{ .name }}
+          image: "{{ .image }}"
+          envFrom:
+            - configMapRef:
+                name: {{ $.Release.Name }}-{{ .name }}-config
+          command: ["php", "artisan", "migrate", "--force"]
+{{- end }}
+
+{{- if .runSeeder }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-{{ .name }}
+  namespace: {{ $.Values.global.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed-{{ .name }}
+          image: "{{ .image }}"
+          envFrom:
+            - configMapRef:
+                name: {{ $.Release.Name }}-{{ .name }}-config
+          command: ["php", "artisan", "db:seed", "--force"]
+{{- end }}
+{{- end }}

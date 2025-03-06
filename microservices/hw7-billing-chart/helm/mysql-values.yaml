@@ -1,0 +1,31 @@
+auth:
+  rootPassword: root_password
+
+primary:
+  persistence:
+    enabled: false
+
+initdbScripts:
+  create-dbs.sql: |-
+    CREATE DATABASE IF NOT EXISTS auth_db;
+    CREATE DATABASE IF NOT EXISTS user_db;
+    CREATE DATABASE IF NOT EXISTS order_db;
+    CREATE DATABASE IF NOT EXISTS billing_db;
+    CREATE DATABASE IF NOT EXISTS notification_db;
+
+    CREATE USER 'auth_user'@'%' IDENTIFIED BY 'auth_password';
+    GRANT ALL PRIVILEGES ON auth_db.* TO 'auth_user'@'%';
+
+    CREATE USER 'user_user'@'%' IDENTIFIED BY 'user_password';
+    GRANT ALL PRIVILEGES ON user_db.* TO 'user_user'@'%';
+
+    CREATE USER 'order_user'@'%' IDENTIFIED BY 'order_password';
+    GRANT ALL PRIVILEGES ON order_db.* TO 'order_user'@'%';
+
+    CREATE USER 'billing_user'@'%' IDENTIFIED BY 'billing_password';
+    GRANT ALL PRIVILEGES ON billing_db.* TO 'billing_user'@'%';
+
+    CREATE USER 'notification_user'@'%' IDENTIFIED BY 'notification_password';
+    GRANT ALL PRIVILEGES ON notification_db.* TO 'notification_user'@'%';
+    
+    FLUSH PRIVILEGES;
