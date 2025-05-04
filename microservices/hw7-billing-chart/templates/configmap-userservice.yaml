@@ -10,3 +10,4 @@ data:
   DB_DATABASE: "{{ .Values.userservice.env.DB_DATABASE }}"
   DB_USERNAME: "{{ .Values.userservice.env.DB_USERNAME }}"
   DB_PASSWORD: "{{ .Values.userservice.env.DB_PASSWORD }}"
+  BILLING_SERVICE_HOST: "{{ .Values.userservice.env.BILLING_SERVICE_HOST }}"

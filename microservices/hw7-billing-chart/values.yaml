@@ -140,7 +140,7 @@ services:
     runSeeder: false
 
   - name: userservice
-    image: "ksarien/otus-gateway-user-srv:1.0"
+    image: "ksarien/otus-gateway-user-srv:1.1"
     replicas: 1
     port: 8081
     path: "/api/user"
@@ -164,7 +164,7 @@ services:
     runSeeder: false
 
   - name: notificationservice
-    image: "ksarien/otus-gateway-notification-srv:1.0"
+    image: "ksarien/otus-gateway-notification-srv:1.1"
     replicas: 1
     port: 8084
     path: "/api/notifications"
@@ -184,6 +184,7 @@ userservice:
     DB_DATABASE: "user_db"
     DB_USERNAME: "user_user"
     DB_PASSWORD: "user_password"
+    BILLING_SERVICE_HOST: "http://billingservice:8083"
 
 orderservice:
   env:

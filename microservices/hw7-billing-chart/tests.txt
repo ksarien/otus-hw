@@ -1,127 +1,47 @@
 newman
 
-API Gateway Tests
+Arch Homework API Tests
 
-→ User1 Registration
-  POST http://arch.homework/api/auth/register [201 Created, 301B, 526ms]
+→ 1. User Registration
+  POST http://arch.homework/api/auth/register [201 Created, 301B, 475ms]
   ✓  Status code is 201
-  ┌
-  │ 'User1 Registration Request:', 'POST', 'http://arch.ho
-  │ mework/api/auth/register'
-  │ 'User1 Registration Response:', '{"user_id":19}'
-  └
 
-→ Profile Access Without Login
-  GET http://arch.homework/api/user/profile/19 [401 Unauthorized, 308B, 105ms]
-  ✓  Status code is 401
-  ┌
-  │ 'Profile Access Without Login Request:', 'GET', 'http:
-  │ //arch.homework/api/user/profile/19'
-  │ 'Profile Access Without Login Response:', '<html>\r\n'
-  │  +
-  │   '<head><title>401 Authorization Required</title></he
-  │ ad>\r\n' +
-  │   '<body>\r\n' +
-  │   '<center><h1>401 Authorization Required</h1></center
-  │ >\r\n' +
-  │   '<hr><center>nginx</center>\r\n' +
-  │   '</body>\r\n' +
-  │   '</html>\r\n'
-  └
-
-→ User1 Login
-  POST http://arch.homework/api/auth/login [200 OK, 371B, 155ms]
+→ 2. User Login
+  POST http://arch.homework/api/auth/login [200 OK, 371B, 153ms]
   ✓  Status code is 200
-  ┌
-  │ 'User1 Login Request:', 'POST', 'http://arch.homework/
-  │ api/auth/login'
-  │ 'User1 Login Response:', {
-  │   user_id: 19,
-  │   token: 'GD9KgiUh682WhjF21xl8gM8BK2cFbCRSWU8wMporf5XL
-  │ YF8c0n8m5JEI9svr3Xd4'
-  │ }
-  └
+  ✓  Token is returned
 
-→ User1 Update Profile
-  PUT http://arch.homework/api/user/profile/19 [200 OK, 528B, 210ms]
+→ 3. Get Billing Account (Check Status 200)
+  GET http://arch.homework/api/billing/account [200 OK, 274B, 132ms]
   ✓  Status code is 200
-  ┌
-  │ 'User1 Update Profile Request:', 'PUT', 'http://arch.h
-  │ omework/api/user/profile/19'
-  │ 'User1 Update Profile Response:', {
-  │   id: 18,
-  │   user_id: 19,
-  │   first_name: 'UserUpdated',
-  │   last_name: 'OneUpdated',
-  │   username: 'user1_updated',
-  │   phone: '+1234567890',
-  │   email: 'user1_Nicklaus88@gmail.com',
-  │   created_at: '2025-03-06T00:16:04.000000Z',
-  │   updated_at: '2025-03-06T00:16:04.000000Z'
-  │ }
-  └
-  ✓  Response contains first_name, last_name, username, phone
 
-→ User1 Get Profile
-  GET http://arch.homework/api/user/profile/19 [200 OK, 528B, 144ms]
+→ 4. Credit Account with 100
+  POST http://arch.homework/api/billing/credit [200 OK, 266B, 140ms]
   ✓  Status code is 200
-  ✓  First name is updated
-  ┌
-  │ 'User1 Get Profile Request:', 'GET', 'http://arch.home
-  │ work/api/user/profile/19'
-  │ 'User1 Get Profile Response:', {
-  │   id: 18,
-  │   user_id: 19,
-  │   first_name: 'UserUpdated',
-  │   last_name: 'OneUpdated',
-  │   username: 'user1_updated',
-  │   phone: '+1234567890',
-  │   email: 'user1_Nicklaus88@gmail.com',
-  │   created_at: '2025-03-06T00:16:04.000000Z',
-  │   updated_at: '2025-03-06T00:16:04.000000Z'
-  │ }
-  └
 
-→ User1 Logout
-  POST http://arch.homework/api/auth/logout [200 OK, 306B, 140ms]
+→ 5. Create Order for 75 and Check Status 'paid'
+  POST http://arch.homework/api/orders [200 OK, 275B, 414ms]
   ✓  Status code is 200
-  ┌
-  │ 'User1 Logout Request:', 'POST', 'http://arch.homework
-  │ /api/auth/logout'
-  │ 'User1 Logout Response:', { message: 'Logged out' }
-  └
+  ✓  Order status is paid
 
-→ User2 Registration
-  POST http://arch.homework/api/auth/register [201 Created, 301B, 239ms]
-  ✓  Status code is 201
-  ┌
-  │ 'User2 Registration Request:', 'POST', 'http://arch.ho
-  │ mework/api/auth/register'
-  │ 'User2 Registration Response:', '{"user_id":20}'
-  └
-
-→ User2 Login
-  POST http://arch.homework/api/auth/login [200 OK, 371B, 147ms]
+→ 6. Check Billing Balance (25)
+  GET http://arch.homework/api/billing/account [200 OK, 275B, 125ms]
   ✓  Status code is 200
-  ┌
-  │ 'User2 Login Request:', 'POST', 'http://arch.homework/
-  │ api/auth/login'
-  │ 'User2 Login Response:', {
-  │   user_id: 20,
-  │   token: 'ey8zDdnhn7aAglLGZ40iAoOzd0IHcfwRwqWqNsGj5Q5Y
-  │ J2zHgkT5qvM6JxdiHeAf'
-  │ }
-  └
+  ✓  Balance after paying 75 should be 25
 
-→ User2 Get Profile (should be forbidden for User1's profile)
-  GET http://arch.homework/api/user/profile/19 [403 Forbidden, 316B, 121ms]
-  ✓  Status code is 403
-  ┌
-  │ 'User2 Get Profile (forbidden) Request:', 'GET', 'http
-  │ ://arch.homework/api/user/profile/19'
-  │ 'User2 Get Profile (forbidden) Response:', '{"message"
-  │ :"Access Denied"}'
-  └
+→ 7. Create Order for 100
+  POST http://arch.homework/api/orders [200 OK, 279B, 290ms]
+  ✓  Status code is 200
+
+→ 8. Get Billing Account and Assert Balance Unchanged
+  GET http://arch.homework/api/billing/account [200 OK, 275B, 123ms]
+  ✓  Status code is 200
+  ✓  Balance remains unchanged
+
+→ 9. Get Notifications (Expect 2 notifications)
+  GET http://arch.homework/api/notifications?user_id=19 [200 OK, 1.2kB, 136ms]
+  ✓  Status code is 200
+  ✓  Notifications count is 2
 
 ┌─────────────────────────┬─────────────────────┬────────────────────┐
 │                         │            executed │             failed │
@@ -134,11 +54,11 @@ API Gateway Tests
 ├─────────────────────────┼─────────────────────┼────────────────────┤
 │      prerequest-scripts │                   0 │                  0 │
 ├─────────────────────────┼─────────────────────┼────────────────────┤
-│              assertions │                  11 │                  0 │
+│              assertions │                  14 │                  0 │
 ├─────────────────────────┴─────────────────────┴────────────────────┤
-│ total run duration: 1942ms                                         │
+│ total run duration: 2.1s                                           │
 ├────────────────────────────────────────────────────────────────────┤
-│ total data received: 921B (approx)                                 │
+│ total data received: 1.27kB (approx)                               │
 ├────────────────────────────────────────────────────────────────────┤
-│ average response time: 198ms [min: 105ms, max: 526ms, s.d.: 122ms] │
+│ average response time: 220ms [min: 123ms, max: 475ms, s.d.: 129ms] │
 └────────────────────────────────────────────────────────────────────┘

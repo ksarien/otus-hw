@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-ingress-auth
   namespace: {{ .Values.global.namespace }}
   annotations:
-    nginx.ingress.kubernetes.io/auth-url: "http://authservice.otus-gateway.svc.cluster.local:8080/api/auth/validate-token"
+    nginx.ingress.kubernetes.io/auth-url: "http://authservice.{{ .Values.global.namespace }}.svc.cluster.local:8080/api/auth/validate-token"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-User-Id"
 spec:
   ingressClassName: nginx
@@ -51,7 +51,7 @@ spec:
                 port:
                   number: 8083
 
-          - path: /api/notification
+          - path: /api/notifications
             pathType: Prefix
             backend:
               service:

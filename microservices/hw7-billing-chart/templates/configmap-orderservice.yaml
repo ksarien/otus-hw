@@ -10,5 +10,5 @@ data:
   DB_DATABASE: "{{ .Values.orderservice.env.DB_DATABASE }}"
   DB_USERNAME: "{{ .Values.orderservice.env.DB_USERNAME }}"
   DB_PASSWORD: "{{ .Values.orderservice.env.DB_PASSWORD }}"
-  BILLING_SERVICE_URL: "{{ .Values.authservice.env.BILLING_SERVICE_URL }}"
-  NOTIFICATION_SERVICE_URL: "{{ .Values.authservice.env.NOTIFICATION_SERVICE_URL }}"
+  BILLING_SERVICE_URL: "{{ .Values.orderservice.env.BILLING_SERVICE_URL }}"
+  NOTIFICATION_SERVICE_URL: "{{ .Values.orderservice.env.NOTIFICATION_SERVICE_URL }}"

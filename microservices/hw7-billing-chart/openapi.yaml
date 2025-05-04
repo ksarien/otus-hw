@@ -1,0 +1,253 @@
+# AuthService
+openapi: 3.0.0
+info:
+  title: AuthService API
+  version: 1.0.0
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - username
+                - phone
+                - email
+                - password
+                - repeat_password
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                username:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                repeat_password:
+                  type: string
+      responses:
+        '201':
+          description: User created
+        '422':
+          description: Validation error
+  /api/auth/login:
+    post:
+      summary: Login user and retrieve token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login success, token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+---
+# UserService
+openapi: 3.0.0
+info:
+  title: UserService API
+  version: 1.0.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/user/profile/{id}:
+    get:
+      summary: Get user profile by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User profile returned
+        '404':
+          description: User not found
+---
+# BillingService
+openapi: 3.0.0
+info:
+  title: BillingService API
+  version: 1.0.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/billing/account:
+    get:
+      summary: Get billing account
+      responses:
+        '200':
+          description: Billing account details
+        '401':
+          description: Unauthorized
+  /api/billing/credit:
+    post:
+      summary: Credit balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+              required:
+                - amount
+      responses:
+        '200':
+          description: Balance credited
+        '401':
+          description: Unauthorized
+  /api/billing/debit:
+    post:
+      summary: Debit balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+              required:
+                - amount
+      responses:
+        '200':
+          description: Debited successfully
+        '400':
+          description: Insufficient funds
+        '401':
+          description: Unauthorized
+---
+# OrderService
+openapi: 3.0.0
+info:
+  title: OrderService API
+  version: 1.0.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/orders:
+    post:
+      summary: Create new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+              required:
+                - amount
+      responses:
+        '200':
+          description: Order created
+        '401':
+          description: Unauthorized
+---
+# NotificationService
+openapi: 3.0.0
+info:
+  title: NotificationService API
+  version: 1.0.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/notifications/send:
+    post:
+      summary: Send notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - template_name
+                - params
+              properties:
+                user_id:
+                  type: integer
+                template_name:
+                  type: string
+                params:
+                  type: object
+      responses:
+        '200':
+          description: Notification sent
+        '401':
+          description: Unauthorized
+  /api/notifications:
+    get:
+      summary: Get notifications
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of notifications
+        '401':
+          description: Unauthorized

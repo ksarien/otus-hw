@@ -8,14 +8,6 @@
         {
             "key": "baseUrl",
             "value": "http://arch.homework"
-        },
-        {
-            "key": "authToken",
-            "value": ""
-        },
-        {
-            "key": "saved_balance",
-            "value": ""
         }
     ],
     "item": [
@@ -55,9 +47,9 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "// Проверяем, что статус ответа 200 OK",
-                            "pm.test(\"Status code is 200\", function () {",
-                            "    pm.expect(pm.response.code).to.eql(200);",
+                            "// Проверяем, что статус ответа 201 OK",
+                            "pm.test(\"Status code is 201\", function () {",
+                            "    pm.expect(pm.response.code).to.eql(201);",
                             "});",
                             "",
                             "// Сохраняем email и password для логина (динамически, без предварительного задания в переменных коллекции)",
@@ -282,10 +274,14 @@
             ]
         },
         {
-            "name": "6. Get Billing Account and Save Balance",
+            "name": "6. Check Billing Balance (25)",
             "request": {
                 "method": "GET",
                 "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
                     {
                         "key": "Authorization",
                         "value": "{{authToken}}"
@@ -313,18 +309,10 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "// Проверяем, что статус ответа 200 OK и сохраняем баланс",
-                            "pm.test(\"Status code is 200\", function () {",
-                            "    pm.expect(pm.response.code).to.eql(200);",
-                            "});",
-                            "",
-                            "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
-                            "if(res.balance !== undefined){",
-                            "    pm.environment.set(\"saved_balance\", res.balance);",
-                            "    console.log('Saved balance:', res.balance);",
-                            "} else {",
-                            "    console.error('Balance not found in response');",
-                            "}"
+                            "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                            "let res = pm.response.json();",
+                            "pm.test('Balance after paying 75 should be 25', () => pm.expect(res.balance).to.eql(25));",
+                            "pm.environment.set('balance', res.balance);"
                         ]
                     }
                 }
@@ -379,7 +367,7 @@
             ]
         },
         {
-            "name": "8. Get Billing Account and Assert Saved Balance",
+            "name": "8. Get Billing Account and Assert Balance Unchanged",
             "request": {
                 "method": "GET",
                 "header": [
@@ -417,9 +405,9 @@
                             "",
                             "// Получаем баланс из ответа и сравниваем с сохранённым",
                             "var res = {};\ntry { res = pm.response.json(); } catch(e) { res = {}; }",
-                            "var saved = pm.environment.get(\"saved_balance\");",
+                            "var balance = pm.environment.get(\"balance\");",
                             "pm.test(\"Balance remains unchanged\", function () {",
-                            "    pm.expect(Number(res.balance)).to.eql(Number(saved));",
+                            "    pm.expect(Number(res.balance)).to.eql(Number(balance));",
                             "});"
                         ]
                     }
