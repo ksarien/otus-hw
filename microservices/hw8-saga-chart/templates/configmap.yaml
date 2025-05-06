@@ -1,0 +1,20 @@
+{{- range .Values.services }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-{{ .name }}-config
+  namespace: {{ $.Values.global.namespace }}
+data:
+  DB_CONNECTION: "mysql"
+  DB_HOST: "{{ $.Values.database.host }}"
+  DB_PORT: "{{ $.Values.database.port }}"
+  DB_DATABASE: "{{ index $.Values (printf "%s" .name) "env" "DB_DATABASE" }}"
+  DB_USERNAME: "{{ index $.Values (printf "%s" .name) "env" "DB_USERNAME" }}"
+  DB_PASSWORD: "{{ index $.Values (printf "%s" .name) "env" "DB_PASSWORD" }}"
+  {{- range $key, $val := (index $.Values (printf "%s" .name) "env") }}
+  {{- if not (has $key (list "DB_DATABASE" "DB_USERNAME" "DB_PASSWORD")) }}
+  {{ $key }}: "{{ $val }}"
+  {{- end }}
+  {{- end }}
+{{- end }}

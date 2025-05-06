@@ -1,0 +1,247 @@
+{
+  "info": {
+    "name": "saga-final-test",
+    "_postman_id": "saga-final-test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Order 1 (success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "orders"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"items\":[{\"item_id\":1,\"quantity\":1,\"price\":50.0}],\"total_amount\":50.0,\"delivery_date\":\"2025-05-07\",\"slot_id\":1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('HTTP 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Order 2 (success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "orders"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"items\":[{\"item_id\":1,\"quantity\":1,\"price\":50.0}],\"total_amount\":50.0,\"delivery_date\":\"2025-05-07\",\"slot_id\":1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('HTTP 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Check inventory before fail",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/inventory/items",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "inventory", "items"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "pm.environment.set('pre_fail_stock', json.find(i => i.id === 1).stock);",
+              "pm.test('Captured pre_fail_stock', function () {",
+              "    pm.expect(pm.environment.get('pre_fail_stock')).to.not.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Check balance before fail",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payments/balance",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "payments", "balance"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "pm.environment.set('pre_fail_balance', json.balance);",
+              "pm.test('Captured pre_fail_balance', function () {",
+              "    pm.expect(pm.environment.get('pre_fail_balance')).to.not.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Order 3 (expected fail)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "orders"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"items\":[{\"item_id\":1,\"quantity\":1,\"price\":50.0}],\"total_amount\":50.0,\"delivery_date\":\"2025-05-07\",\"slot_id\":1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('HTTP 409', function () {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Check inventory after rollback",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/inventory/items",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "inventory", "items"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "var actual = json.find(i => i.id === 1).stock;",
+              "var expected = pm.environment.get('pre_fail_stock');",
+              "pm.test('Stock after rollback matches saved pre_fail_stock', function () {",
+              "    pm.expect(parseFloat(actual)).to.eql(parseFloat(expected));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Check balance after rollback",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "2" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payments/balance",
+          "protocol": "http",
+          "host": ["arch", "homework"],
+          "path": ["api", "payments", "balance"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "var actual = json.balance;",
+              "var expected = pm.environment.get('pre_fail_balance');",
+              "pm.test('Balance after rollback matches saved pre_fail_balance', function () {",
+              "    pm.expect(parseFloat(actual)).to.eql(parseFloat(expected));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://arch.homework"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+newman
+
+saga-final-test
+
+→ 1. Order 1 (success)
+  POST http://arch.homework/api/orders [201 Created, 340B, 1242ms]
+  ✓  HTTP 201
+
+→ 2. Order 2 (success)
+  POST http://arch.homework/api/orders [201 Created, 340B, 344ms]
+  ✓  HTTP 201
+
+→ 3. Check inventory before fail
+  GET http://arch.homework/api/inventory/items [200 OK, 437B, 60ms]
+  ✓  Captured pre_fail_stock
+
+→ 4. Check balance before fail
+  GET http://arch.homework/api/payments/balance [200 OK, 304B, 54ms]
+  ✓  Captured pre_fail_balance
+
+→ 5. Order 3 (expected fail)
+  POST http://arch.homework/api/orders [409 Conflict, 338B, 416ms]
+  ✓  HTTP 409
+
+→ 6. Check inventory after rollback
+  GET http://arch.homework/api/inventory/items [200 OK, 437B, 51ms]
+  ✓  Stock after rollback matches saved pre_fail_stock
+
+→ 7. Check balance after rollback
+  GET http://arch.homework/api/payments/balance [200 OK, 304B, 48ms]
+  ✓  Balance after rollback matches saved pre_fail_balance
+
+┌─────────────────────────┬─────────────────────┬────────────────────┐
+│                         │            executed │             failed │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              iterations │                   1 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│                requests │                   7 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│            test-scripts │                   7 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│      prerequest-scripts │                   0 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              assertions │                   7 │                  0 │
+├─────────────────────────┴─────────────────────┴────────────────────┤
+│ total run duration: 2.3s                                           │
+├────────────────────────────────────────────────────────────────────┤
+│ total data received: 510B (approx)                                 │
+├────────────────────────────────────────────────────────────────────┤
+│ average response time: 316ms [min: 48ms, max: 1242ms, s.d.: 404ms] │
+└────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,26 @@
+auth:
+  rootPassword: root_password
+
+primary:
+  persistence:
+    enabled: false
+
+initdbScripts:
+  create-saga-dbs.sql: |-
+    CREATE DATABASE IF NOT EXISTS orders_db;
+    CREATE USER 'orders_user'@'%' IDENTIFIED BY 'orders_pass';
+    GRANT ALL PRIVILEGES ON orders_db.* TO 'orders_user'@'%';
+
+    CREATE DATABASE IF NOT EXISTS payments_db;
+    CREATE USER 'payments_user'@'%' IDENTIFIED BY 'payments_pass';
+    GRANT ALL PRIVILEGES ON payments_db.* TO 'payments_user'@'%';
+
+    CREATE DATABASE IF NOT EXISTS inventory_db;
+    CREATE USER 'inventory_user'@'%' IDENTIFIED BY 'inventory_pass';
+    GRANT ALL PRIVILEGES ON inventory_db.* TO 'inventory_user'@'%';
+
+    CREATE DATABASE IF NOT EXISTS delivery_db;
+    CREATE USER 'delivery_user'@'%' IDENTIFIED BY 'delivery_pass';
+    GRANT ALL PRIVILEGES ON delivery_db.* TO 'delivery_user'@'%';
+
+    FLUSH PRIVILEGES;
