@@ -158,7 +158,7 @@ deliveryservice:
 
 services:
   - name: orderservice
-    image: ksarien/otus-saga-order-srv:1.1
+    image: ksarien/otus-saga-order-srv:1.2
     replicas: 1
     port: 8081
     path: "/api/orders"

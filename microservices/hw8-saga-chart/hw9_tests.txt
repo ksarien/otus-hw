@@ -1,0 +1,101 @@
+newman
+
+saga-idempotency-tests
+
+→ 1. Create order with idempotency key
+  POST http://arch.homework/api/orders  
+  201 Created ★ 1521ms time ★ 453B↑ 443B↓ size ★ 11↑ 9↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 114B
+  │ {"items":[{"item_id":1,"quantity":1,"price":50.00}],"t
+  │ otal_amount":50.00,"delivery_date":"2025-05-07","slot_
+  │ id":1}
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 156B
+  │ {"order_id":1,"user_id":"1","total_amount":50,"status"
+  │ :"confirmed","items":[{"item_id":1,"quantity":1,"price
+  │ ":50}],"delivery_date":"2025-05-07","slot_id":1}
+  └
+  prepare   wait   dns-lookup   tcp-handshake   transfer-start   download   process   total  
+  12ms      5ms    4ms          454µs           1497ms           11ms       153µs     1532ms 
+
+  ✓  Status is 201
+
+→ 2. Repeat order with same key
+  POST http://arch.homework/api/orders  
+  201 Created ★ 57ms time ★ 453B↑ 443B↓ size ★ 11↑ 9↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 114B
+  │ {"items":[{"item_id":1,"quantity":1,"price":50.00}],"t
+  │ otal_amount":50.00,"delivery_date":"2025-05-07","slot_
+  │ id":1}
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 156B
+  │ {"items":[{"price":50,"item_id":1,"quantity":1}],"stat
+  │ us":"confirmed","slot_id":1,"user_id":"1","order_id":1
+  │ ,"total_amount":50,"delivery_date":"2025-05-07"}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  801µs     518µs   (cache)      (cache)         54ms             1ms        35µs      57ms  
+
+  ✓  Status is 201
+  ✓  Response identical
+
+→ 3. Create new order without key
+  POST http://arch.homework/api/orders  
+  201 Created ★ 297ms time ★ 432B↑ 445B↓ size ★ 10↑ 9↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 116B
+  │ {"items":[{"item_id":2,"quantity":1,"price":100.00}],"
+  │ total_amount":100.00,"delivery_date":"2025-05-08","slo
+  │ t_id":2}
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 158B
+  │ {"order_id":2,"user_id":"1","total_amount":100,"status
+  │ ":"confirmed","items":[{"item_id":2,"quantity":1,"pric
+  │ e":100}],"delivery_date":"2025-05-08","slot_id":2}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  648µs     162µs   (cache)      (cache)         294ms            2ms        40µs      297ms 
+
+  ✓  Status is 201
+
+→ 4. Repeat new order without key
+  POST http://arch.homework/api/orders  
+  201 Created ★ 236ms time ★ 432B↑ 445B↓ size ★ 10↑ 9↓ headers ★ 0 cookies
+  ┌ ↑ raw ★ 116B
+  │ {"items":[{"item_id":2,"quantity":1,"price":100.00}],"
+  │ total_amount":100.00,"delivery_date":"2025-05-08","slo
+  │ t_id":2}
+  └ 
+  ┌ ↓ application/json ★ text ★ json ★ utf8 ★ 158B
+  │ {"order_id":3,"user_id":"1","total_amount":100,"status
+  │ ":"confirmed","items":[{"item_id":2,"quantity":1,"pric
+  │ e":100}],"delivery_date":"2025-05-08","slot_id":2}
+  └
+  prepare   wait    dns-lookup   tcp-handshake   transfer-start   download   process   total 
+  735µs     263µs   (cache)      (cache)         232ms            2ms        36µs      236ms 
+
+  ✓  Status is 201
+  ✓  New orderId differs
+
+┌─────────────────────────┬──────────────────────┬─────────────────────┐
+│                         │             executed │              failed │
+├─────────────────────────┼──────────────────────┼─────────────────────┤
+│              iterations │                    1 │                   0 │
+├─────────────────────────┼──────────────────────┼─────────────────────┤
+│                requests │                    4 │                   0 │
+├─────────────────────────┼──────────────────────┼─────────────────────┤
+│            test-scripts │                    4 │                   0 │
+├─────────────────────────┼──────────────────────┼─────────────────────┤
+│      prerequest-scripts │                    0 │                   0 │
+├─────────────────────────┼──────────────────────┼─────────────────────┤
+│              assertions │                    6 │                   0 │
+├─────────────────────────┴──────────────────────┴─────────────────────┤
+│ total run duration: 2.2s                                             │
+├──────────────────────────────────────────────────────────────────────┤
+│ total data received: 628B (approx)                                   │
+├──────────────────────────────────────────────────────────────────────┤
+│ average response time: 527ms [min: 57ms, max: 1521ms, s.d.: 580ms]   │
+├──────────────────────────────────────────────────────────────────────┤
+│ average DNS lookup time: 4ms [min: 4ms, max: 4ms, s.d.: 0µs]         │
+├──────────────────────────────────────────────────────────────────────┤
+│ average first byte time: 519ms [min: 54ms, max: 1497ms, s.d.: 571ms] │
+└──────────────────────────────────────────────────────────────────────┘
